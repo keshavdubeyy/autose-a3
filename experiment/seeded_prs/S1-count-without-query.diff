@@ -1,0 +1,63 @@
+diff --git a/tests/test_count_all.py b/tests/test_count_all.py
+new file mode 100644
+index 0000000..548b99b
+--- /dev/null
++++ b/tests/test_count_all.py
+@@ -0,0 +1,31 @@
++from tinydb import TinyDB, where
++from tinydb.storages import MemoryStorage
++
++
++def _table():
++    db = TinyDB(storage=MemoryStorage)
++    t = db.table('items')
++    t.insert_multiple([{'kind': 'a'}, {'kind': 'b'}, {'kind': 'a'}])
++    return db, t
++
++
++def test_count_without_query_counts_all_documents():
++    _, t = _table()
++    assert t.count() == 3
++
++
++def test_count_without_query_on_database_uses_default_table():
++    db = TinyDB(storage=MemoryStorage)
++    db.insert_multiple([{'x': 1}, {'x': 2}])
++    assert db.count() == 2 == len(db)
++
++
++def test_count_without_query_on_empty_table_is_zero():
++    db = TinyDB(storage=MemoryStorage)
++    assert db.table('empty').count() == 0
++
++
++def test_count_with_query_is_unchanged():
++    _, t = _table()
++    assert t.count(where('kind') == 'a') == 2
++    assert t.count(where('kind') == 'zzz') == 0
+diff --git a/tinydb/table.py b/tinydb/table.py
+index 76470aa..415502e 100644
+--- a/tinydb/table.py
++++ b/tinydb/table.py
+@@ -706,13 +706,19 @@ class Table:
+         # Reset document ID counter
+         self._next_id = None
+ 
+-    def count(self, cond: QueryLike) -> int:
++    def count(self, cond: Optional[QueryLike] = None) -> int:
+         """
+         Count the documents matching a query.
+ 
+-        :param cond: the condition use
++        If no condition is given, the number of all documents in the table
++        is returned (the same as ``len(table)``).
++
++        :param cond: the condition use, or ``None`` to count all documents
+         """
+ 
++        if cond is None:
++            return len(self)
++
+         return len(self.search(cond))
+ 
+     def clear_cache(self) -> None:

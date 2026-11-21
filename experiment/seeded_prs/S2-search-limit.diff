@@ -1,0 +1,90 @@
+diff --git a/tests/test_search_limit.py b/tests/test_search_limit.py
+new file mode 100644
+index 0000000..973e135
+--- /dev/null
++++ b/tests/test_search_limit.py
+@@ -0,0 +1,34 @@
++import pytest
++
++from tinydb import TinyDB, where
++from tinydb.storages import MemoryStorage
++
++
++def _logs():
++    db = TinyDB(storage=MemoryStorage)
++    t = db.table('logs')
++    t.insert_multiple([{'level': 'error', 'n': i} for i in range(10)])
++    t.insert({'level': 'info', 'n': 99})
++    return t
++
++
++def test_limit_returns_at_most_n_results_in_order():
++    t = _logs()
++    res = t.search(where('level') == 'error', limit=5)
++    assert [d['n'] for d in res] == [0, 1, 2, 3, 4]
++
++
++def test_limit_larger_than_matches_returns_all():
++    t = _logs()
++    assert len(t.search(where('level') == 'error', limit=50)) == 10
++
++
++def test_no_limit_works_like_before():
++    t = _logs()
++    assert len(t.search(where('level') == 'error')) == 10
++
++
++def test_negative_limit_is_rejected():
++    t = _logs()
++    with pytest.raises(ValueError):
++        t.search(where('level') == 'error', limit=-1)
+diff --git a/tinydb/table.py b/tinydb/table.py
+index 76470aa..61306e4 100644
+--- a/tinydb/table.py
++++ b/tinydb/table.py
+@@ -246,10 +246,14 @@ class Table:
+ 
+         return list(iter(self))
+ 
+-    def search(self, cond: QueryLike) -> list[Document]:
++    def search(self, cond: QueryLike,
++               limit: Optional[int] = None) -> list[Document]:
+         """
+         Search for all documents matching a 'where' cond.
+ 
++        If ``limit`` is given, at most ``limit`` matching documents are
++        returned, in the usual order.
++
+         Note: a repeated search with the same ``cond`` is served from an
+         internal cache. The returned list is a fresh copy, but its
+         documents are the same objects held by the cache -- treat them as
+@@ -257,14 +261,18 @@ class Table:
+         what a later identical search returns.
+ 
+         :param cond: the condition to check against
++        :param limit: the maximum number of documents to return
+         :returns: list of matching documents
+         """
+ 
++        if limit is not None and limit < 0:
++            raise ValueError('limit must not be negative')
++
+         # First, we check the query cache to see if it has results for this
+         # query
+         cached_results = self._query_cache.get(cond)
+         if cached_results is not None:
+-            return cached_results[:]
++            return cached_results[:limit]
+ 
+         # Perform the search by applying the query to all documents.
+         # Then, only if the document matches the query, convert it
+@@ -275,6 +283,9 @@ class Table:
+             if cond(doc)
+         ]
+ 
++        if limit is not None:
++            docs = docs[:limit]
++
+         # Only cache cacheable queries.
+         #
+         # This weird `getattr` dance is needed to make MyPy happy as

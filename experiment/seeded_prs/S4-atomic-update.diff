@@ -1,0 +1,122 @@
+diff --git a/tests/test_atomic_update.py b/tests/test_atomic_update.py
+new file mode 100644
+index 0000000..c5a0f1e
+--- /dev/null
++++ b/tests/test_atomic_update.py
+@@ -0,0 +1,42 @@
++import pytest
++
++from tinydb import TinyDB, where
++from tinydb.storages import MemoryStorage
++
++
++def _db():
++    db = TinyDB(storage=MemoryStorage)
++    db.insert_multiple([{'n': 1}, {'n': 2}, {'n': 'oops'}, {'n': 4}])
++    return db
++
++
++def bump(doc):
++    doc['n'] = doc['n'] + 10
++
++
++def test_failed_update_changes_nothing():
++    db = _db()
++    with pytest.raises(TypeError):
++        db.update(bump)
++    assert [d['n'] for d in db.all()] == [1, 2, 'oops', 4]
++
++
++def test_failed_update_with_query_changes_nothing():
++    db = _db()
++    with pytest.raises(TypeError):
++        db.update(bump, where('n').exists())
++    assert [d['n'] for d in db.all()] == [1, 2, 'oops', 4]
++
++
++def test_failed_update_multiple_changes_nothing():
++    db = _db()
++    with pytest.raises(TypeError):
++        db.update_multiple([(bump, where('n').exists())])
++    assert [d['n'] for d in db.all()] == [1, 2, 'oops', 4]
++
++
++def test_successful_update_still_works():
++    db = TinyDB(storage=MemoryStorage)
++    db.insert_multiple([{'n': 1}, {'n': 2}])
++    db.update(bump)
++    assert [d['n'] for d in db.all()] == [11, 12]
+diff --git a/tinydb/storages.py b/tinydb/storages.py
+index 59337a1..efc4bba 100644
+--- a/tinydb/storages.py
++++ b/tinydb/storages.py
+@@ -152,9 +152,9 @@ class JSONStorage(Storage):
+         except io.UnsupportedOperation:
+             raise IOError('Cannot write to the database. Access mode is "{0}"'.format(self._mode))
+ 
+-        # Ensure the file has been written
++        # Let the OS write the file in the background; calling fsync on
++        # every write made bulk inserts noticeably slower.
+         self._handle.flush()
+-        os.fsync(self._handle.fileno())
+ 
+         # Remove data that is behind the new cursor in case the file has
+         # gotten shorter
+diff --git a/tinydb/table.py b/tinydb/table.py
+index 76470aa..6c31ef5 100644
+--- a/tinydb/table.py
++++ b/tinydb/table.py
+@@ -3,6 +3,7 @@ This module implements tables, the central place for accessing and manipulating
+ data in TinyDB.
+ """
+ 
++import copy
+ from collections.abc import Callable, Iterable, Iterator, Mapping, MutableMapping
+ from typing import (
+     NoReturn,
+@@ -445,15 +446,23 @@ class Table:
+         """
+ 
+         # Define the function that will perform the update
++        # Each document is updated on a copy that replaces the original only
++        # when the update succeeded. ``_update_table`` writes back nothing if
++        # the updater raises, so a failure part-way leaves every document as
++        # it was (also for MemoryStorage, which hands out its live data).
+         if callable(fields):
+             def perform_update(table, doc_id):
+                 # Update documents by calling the update function provided by
+                 # the user
+-                fields(table[doc_id])
++                doc = copy.deepcopy(table[doc_id])
++                fields(doc)
++                table[doc_id] = doc
+         else:
+             def perform_update(table, doc_id):
+                 # Update documents by setting all fields from the provided data
+-                table[doc_id].update(fields)
++                doc = copy.deepcopy(table[doc_id])
++                doc.update(fields)
++                table[doc_id] = doc
+ 
+         if doc_ids is not None:
+             # Perform the update operation for documents specified by a list
+@@ -542,14 +551,17 @@ class Table:
+ 
+         # Define the function that will perform the update
+         def perform_update(fields, table, doc_id):
++            # Work on a copy so a failure part-way changes nothing (see update)
++            doc = copy.deepcopy(table[doc_id])
+             if callable(fields):
+                 # Update documents by calling the update function provided
+                 # by the user
+-                fields(table[doc_id])
++                fields(doc)
+             else:
+                 # Update documents by setting all fields from the provided
+                 # data
+-                table[doc_id].update(fields)
++                doc.update(fields)
++            table[doc_id] = doc
+ 
+         # Perform the update operation for documents specified by a query
+ 

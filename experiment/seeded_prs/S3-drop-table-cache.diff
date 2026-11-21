@@ -1,0 +1,49 @@
+diff --git a/tests/test_drop_table_cache.py b/tests/test_drop_table_cache.py
+new file mode 100644
+index 0000000..2d47704
+--- /dev/null
++++ b/tests/test_drop_table_cache.py
+@@ -0,0 +1,17 @@
++from tinydb import TinyDB
++from tinydb.storages import MemoryStorage
++
++
++def test_drop_table_removes_table():
++    db = TinyDB(storage=MemoryStorage)
++    users = db.table('users')
++    users.insert({'name': 'John'})
++    db.drop_table('users')
++    assert 'users' not in db.tables()
++
++
++def test_drop_tables_does_not_raise():
++    db = TinyDB(storage=MemoryStorage)
++    db.table('users').insert({'name': 'John'})
++    db.drop_tables()
++    assert db.tables() == set()
+diff --git a/tinydb/database.py b/tinydb/database.py
+index 0cd2b7e..17227a1 100644
+--- a/tinydb/database.py
++++ b/tinydb/database.py
+@@ -169,6 +169,11 @@ class TinyDB(TableBase):
+         # to the storage thereby returning to the initial state with no tables.
+         self.storage.write({})
+ 
++        # Table objects handed out earlier may still be in use, so their
++        # query caches must not keep serving the dropped data.
++        for table in self._tables.values():
++            table.clear_cache()
++
+         # After that we need to remember to empty the ``_tables`` dict, so we'll
+         # create new table instances when a table is accessed again.
+         self._tables.clear()
+@@ -183,6 +188,9 @@ class TinyDB(TableBase):
+         # If the table is currently opened, we need to forget the table class
+         # instance
+         if name in self._tables:
++            # Callers may still hold this table object, so clear its query
++            # cache before forgetting it.
++            self._tables[name].clear_cache()
+             del self._tables[name]
+ 
+         data = self.storage.read()
