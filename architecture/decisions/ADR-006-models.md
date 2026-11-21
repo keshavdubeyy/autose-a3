@@ -66,3 +66,9 @@ goes up to $20 and the report says so.
 - **Experiment A** compares the Reviewer on Sonnet 5.5 (different from the Implementer) against
   the Reviewer on Haiku 5.5 (same as the Implementer) on the seeded PRs.
 - Total tokens and cost per run go in `results.csv`, as the assignment requires.
+
+## Evidence after the runs (21 Nov 2026)
+
+- **Experiment A:** Haiku as reviewer also got 5/5 seeded PRs right, at about 1/7 of the cost ($0.019 vs $0.133 for five reviews). It filled the rubric less precisely (once it filed a logic bug under R5) and once went deeper than Sonnet. See `results/experiments.md`.
+- **Decision: keep Sonnet as reviewer.** A review costs about $0.03 per issue, and the reviewer is the last check before a human. The case we care most about was not tested with Haiku: in issue #2, Sonnet found a second, unreported copy of the bug. The saving is real but small in dollars. The argument for this ADR is now weaker than when it was written. If a harder seeded set showed no gap either, this ADR should be superseded.
+- **The cheap implementer held up.** Across 6 issue runs it needed 1 retry after a review send-back (issue #2) and 1 after a CI failure (issue #5). No run ran out of budget.

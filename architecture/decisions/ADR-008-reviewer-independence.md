@@ -79,3 +79,10 @@ bugs). We report what it caught, what it missed, and its false alarms.
   trade-offs. We accept some false alarms and report how many there are.
 - Filling a rubric costs more tokens than a one-line verdict, but it is the only way to tell
   a real approval from a rubber stamp.
+
+## Evidence after the runs (21 Nov 2026)
+
+- **Seeded PRs:** the default reviewer got 5/5 right, with the expected rubric row failing each time.
+- **Experiment B:** a reviewer that read a spec written from the implementer's point of view gave the same verdicts in all 5 valid trials. This includes the PR whose spec listed the risky fsync removal as a requirement. The reviewer checked the spec against the issue rather than trusting it.
+- **Decision: keep the rule.** Hiding the spec costs nothing, and 5 trials cannot rule out a small bias. The rule now stands as a precaution, not a measured effect.
+- **False alarms:** on the five issue PRs and five seeded PRs, there were no rejections of a correct change. The one send-back on a pipeline PR (issue #2) was a real defect.
