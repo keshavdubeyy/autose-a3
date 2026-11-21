@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>AutoSE A3 report</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <style>
+  @page { size: A4; margin: 15mm 15mm 15mm 15mm; }
+  body { font-family: "Helvetica Neue", Arial, sans-serif; font-size: 9.6pt; line-height: 1.36; color: #111; max-width: none; margin: 0; padding: 0; }
+  header#title-block-header { margin-bottom: 4px; }
+  h1.title { font-size: 17pt; margin: 0 0 2px; }
+  p.subtitle { font-size: 10.5pt; margin: 0 0 6px; color: #444; }
+  h1 { font-size: 12.5pt; margin: 12px 0 4px; border-bottom: 1px solid #999; padding-bottom: 2px; }
+  p { margin: 4px 0; }
+  table { border-collapse: collapse; width: 100%; font-size: 8.2pt; margin: 5px 0; page-break-inside: avoid; }
+  th, td { border: 1px solid #bbb; padding: 2px 4px; vertical-align: top; text-align: left; }
+  th { background: #eee; }
+  code { font-size: 8.4pt; background: #f3f3f3; padding: 0 2px; }
+  pre.mermaid { background: none; text-align: center; margin: 4px 0; page-break-inside: avoid; }
+  pre.mermaid svg { max-height: 300px; max-width: 100%; }
+  ol, ul { margin: 3px 0; padding-left: 20px; }
+  li { margin: 1px 0; }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('pre.mermaid').forEach(p => { p.textContent = p.textContent; });
+    mermaid.initialize({ startOnLoad: false, theme: 'neutral', flowchart: { useMaxWidth: true }, sequence: { useMaxWidth: true } });
+    mermaid.run({ querySelector: 'pre.mermaid' });
+  });
+  </script>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">AutoSE A3: Issue In, Reviewed Pull Request Out</h1>
+<p class="subtitle">An agentic SDLC workflow for TinyDB on GitHub Actions</p>
+</header>
+<p><strong>Repository:</strong> github.com/keshavdubeyy/autose-a3 · <strong>Fork:</strong> github.com/keshavdubeyy/tinydb, pinned at upstream <code>edff96a</code> · <strong>Models:</strong> Claude Sonnet 5.5 (Planner, Reviewer) and Claude Haiku 5.5 (Implementer, Tester, judge) · <strong>Total spend:</strong> $1.10 over 23 workflow runs.</p>
+<p><strong>Headline results.</strong></p>
+<ul>
+<li>All 5 issues ended with a reviewer-approved PR, and 16/16 hidden tests pass on the bot’s branches. One issue (#5, the vague one) needed a single maintainer clarification after the pipeline correctly stopped and escalated.</li>
+<li>The reviewer gave the right verdict on 5/5 seeded PRs.</li>
+<li>Neither decision experiment changed a verdict. Both are negative results, and we report them as such.</li>
+</ul>
+<h1 id="architecture">1. Architecture</h1>
+<p>The workflow (<code>.github/workflows/autose.yml</code>) has three jobs. Each job has its own token permissions:</p>
+<ul>
+<li><strong>gate</strong> (<code>issues: write</code>, <code>actions: write</code>, read-only contents) decides whether a run may start. It uses no AI.</li>
+<li><strong>build</strong> (<code>contents: write</code>, <code>pull-requests: write</code>) runs stages 1–5. A deterministic Python state machine, <code>orchestrator.py</code>, calls three agents through the Claude Agent SDK and runs a check after every stage.</li>
+<li><strong>review</strong> (<code>contents: read</code>) runs stage 6. The independent Reviewer runs here and cannot push.</li>
+</ul>
+<p><strong>No agent ever holds the GitHub token.</strong> The orchestrator removes it from the environment before any agent starts. All GitHub writes (push, PR, comments) are plain code.</p>
+<p><strong>Component view.</strong> The figure shows which agent knows what (arrows are hand-offs).</p>
+<pre class="mermaid"><code>flowchart LR
+  M([Maintainer]) --&gt;|label autose / /autose| G[gate job&lt;br/&gt;gate.py, no AI]
+  G --&gt; O
+  subgraph B[build job: contents+PR write]
+    O[orchestrator.py&lt;br/&gt;fixed state machine&lt;br/&gt;runs every check]
+    P[Planner · Sonnet&lt;br/&gt;Read/Grep/Glob]
+    J[AI judge · Haiku&lt;br/&gt;no tools]
+    I[Implementer · Haiku&lt;br/&gt;edit tinydb/ only&lt;br/&gt;Bash: pytest only]
+    T[Tester QA · Haiku&lt;br/&gt;write own test file only&lt;br/&gt;Bash: pytest only]
+    O --&gt;|issue in untrusted tags&lt;br/&gt;+ condensed A1 skill| P
+    O --&gt;|criteria only| J
+    O --&gt;|spec + design| I
+    O --&gt;|spec only| T
+  end
+  O --&gt;|push branch, open PR,&lt;br/&gt;dispatch CI, artifacts| GH[(GitHub: PR, CI,&lt;br/&gt;status comment,&lt;br/&gt;artifacts)]
+  subgraph RV[review job: contents READ]
+    R[Reviewer · Sonnet&lt;br/&gt;Read/Grep/Glob&lt;br/&gt;Bash: pytest only]
+  end
+  GH --&gt;|issue + PR diff +&lt;br/&gt;repo at PR head| R
+  R --&gt;|rubric review on PR| GH
+  R -.-&gt;|changes &amp; round&lt;2:&lt;br/&gt;workflow_dispatch| O
+  GH --&gt; H([Human merges or closes])</code></pre>
+<p><strong>Stage map.</strong> Each stage has one agent, one artifact and a check that the orchestrator decides with code.</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Stage</th>
+<th>Agent</th>
+<th>Artifact</th>
+<th>Check (decided by code)</th>
+<th>On failure</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Requirements</td>
+<td>Planner (Sonnet) + judge (Haiku)</td>
+<td><code>spec.md</code></td>
+<td>Goal present; 1–8 ACs in Given/When/Then; judge rates each AC testable</td>
+<td>retry once with the reason, then stop + escalate</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Design</td>
+<td>Planner (Sonnet)</td>
+<td><code>design.md</code></td>
+<td>every named file/function exists, or is marked NEW; no tests/CI/pipeline files</td>
+<td>retry once, then stop</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Implement</td>
+<td>Implementer (Haiku)</td>
+<td><code>diff.patch</code></td>
+<td>only <code>tinydb/</code> changed (other edits reverted); package compiles and imports</td>
+<td>back to 3 (max 3 attempts), then design redo (once), then stop</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Test</td>
+<td>Tester (Haiku)</td>
+<td><code>test_report.md</code></td>
+<td>one <code>test_ac_&lt;n&gt;</code> per AC; full suite passes</td>
+<td>tests stay fixed; back to 3</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Release</td>
+<td>plain code</td>
+<td><code>pr.md</code> + PR</td>
+<td>PR open; CI green</td>
+<td>back to 3 with the CI log</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Review</td>
+<td>Reviewer (Sonnet)</td>
+<td><code>review.md</code></td>
+<td>rubric R1–R6 valid, with evidence; APPROVE only with no failed row</td>
+<td>code → 3, approach → 2; max 2 rounds; then a human</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Sequence view: a real run</strong> (issue #3, run 44920637328, UTC times from the status comment). The full diagram is in <code>architecture/views/sequence-view.md</code>.</p>
+<pre class="mermaid"><code>sequenceDiagram
+  actor M as Maintainer
+  participant G as gate
+  participant O as orchestrator
+  participant A as agents
+  participant CI as CI
+  participant R as Reviewer
+  M-&gt;&gt;G: label autose (15:42:49)
+  G-&gt;&gt;O: proceed, issue 3
+  O-&gt;&gt;A: Planner: spec (4 ACs) ✓ judge ✓ (15:43:44)
+  O-&gt;&gt;A: Planner: design → Table.count ✓ (15:43:56)
+  O-&gt;&gt;A: Implementer edits table.py ✓ build (15:44:10)
+  O-&gt;&gt;A: Tester writes 4 tests ✓ suite passes (15:44:24)
+  O-&gt;&gt;CI: open PR 7, dispatch CI (15:44:32)
+  CI--&gt;&gt;O: green (15:46:17)
+  O-&gt;&gt;R: review job (issue + diff + repo only)
+  R--&gt;&gt;M: APPROVE with evidence (15:47:01) · $0.100 total</code></pre>
+<h1 id="design-decisions">2. Design decisions</h1>
+<p>Thirteen ADRs (Nygard format) are in <code>architecture/decisions/</code>. ADR-001 is kept and marked <em>Superseded</em> by ADR-011.</p>
+<table>
+<thead>
+<tr>
+<th>ADR</th>
+<th>Decision</th>
+<th>Chosen option</th>
+<th>Main option rejected</th>
+<th>Main reason</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>001</td>
+<td>D1 splitting the work</td>
+<td>3 agents; Implementer writes its own tests</td>
+<td>1 agent</td>
+<td>fewer hand-offs</td>
+<td>Superseded by 011</td>
+</tr>
+<tr>
+<td>011</td>
+<td>D1 splitting the work</td>
+<td>4 agents: Planner, Implementer, Tester, Reviewer</td>
+<td>Implementer tests itself</td>
+<td>a builder only tests what it expects to work</td>
+<td>Accepted</td>
+</tr>
+<tr>
+<td>002</td>
+<td>D2 control flow</td>
+<td>fixed state machine + escalation report</td>
+<td>an LLM manager picks the next step</td>
+<td>shows exactly where it failed; cannot be argued out of the rules</td>
+<td>Accepted</td>
+</tr>
+<tr>
+<td>003</td>
+<td>D3 hand-offs</td>
+<td>each agent gets only what it needs; Goal section in spec</td>
+<td>pass everything forward</td>
+<td>extra context misleads and carries injected text</td>
+<td>Accepted</td>
+</tr>
+<tr>
+<td>004</td>
+<td>D4 state</td>
+<td>artifacts + status comment; resume after re-checking</td>
+<td>restart / resume blindly</td>
+<td>keep good work, don’t trust half-done work</td>
+<td>Accepted</td>
+</tr>
+<tr>
+<td>005</td>
+<td>D5 tools</td>
+<td>per-agent allowlists + PreToolUse guard; no agent touches GitHub</td>
+<td>GitHub MCP for agents</td>
+<td>no agent’s job needs a write token</td>
+<td>Accepted</td>
+</tr>
+<tr>
+<td>006</td>
+<td>D6 models</td>
+<td>Sonnet for Planner + Reviewer, Haiku for the rest</td>
+<td>Opus everywhere</td>
+<td>small budget; cheap builder checked by a stronger model</td>
+<td>Accepted (evidence added)</td>
+</tr>
+<tr>
+<td>007</td>
+<td>D7 checks</td>
+<td>code checks first; AI judge only for “testable?” and the review</td>
+<td>AI judge at every gate</td>
+<td>exact questions get exact, free answers</td>
+<td>Accepted</td>
+</tr>
+<tr>
+<td>008</td>
+<td>D8 reviewer independence</td>
+<td>own job, read-only, different model, sees no spec, evidence rubric</td>
+<td>reviewer sees the implementer’s reasoning</td>
+<td>reasoning anchors the reviewer</td>
+<td>Accepted (evidence added)</td>
+</tr>
+<tr>
+<td>009</td>
+<td>D9 safety &amp; failures</td>
+<td>$1/issue, 15 min agent time, untrusted-input layers</td>
+<td>rely on the provider cap</td>
+<td>one bad run must not drain the month</td>
+<td>Accepted</td>
+</tr>
+<tr>
+<td>010</td>
+<td>D10 triggers</td>
+<td>anyone can request; collaborators approve; one run per issue + queue notice</td>
+<td>anyone’s comment starts a run</td>
+<td>strangers could drain the budget</td>
+<td>Accepted</td>
+</tr>
+<tr>
+<td>012</td>
+<td>D3/D10 clarifications</td>
+<td>maintainer comments become “Clarifications”; others ignored</td>
+<td>read all comments</td>
+<td>strangers’ comments are the easiest injection path</td>
+<td>Accepted</td>
+</tr>
+<tr>
+<td>013</td>
+<td>D5/D9 command guard</td>
+<td>only <code>python -m pytest</code>; accept wasted turns</td>
+<td>allow <code>| tail</code> / <code>| head</code></td>
+<td>a wasted turn is ~free; each allowed command is a new leak path</td>
+<td>Accepted</td>
+</tr>
+</tbody>
+</table>
+<p><strong>The three decisions that mattered most.</strong></p>
+<p><em>ADR-011: a separate Tester (QA) agent.</em> My first design (ADR-001) let the Implementer write its own tests. While reviewing it, I did not accept that a builder should check its own work. It will test the cases it already believes work. The cases that would break the code are exactly the ones it didn’t think of. So the Tester sees only the spec, never the design or the Implementer’s conversation, and the Implementer cannot edit the tests: the orchestrator reverts any change outside <code>tinydb/</code>.</p>
+<p>In the real runs, the Tester’s suites passed on the first try, so the “tests stay fixed” rule was exercised in two places. On issue #5, CI failed and the Implementer fixed the code while the tests stayed untouched. In the offline tests of the state machine, the failing-tests path sends work back three times without ever rewriting the tests. On issue #2, the reviewer’s send-back kept the same tests, and the new round still had to pass them. The cost of the extra agent is about $0.003 per issue.</p>
+<p><em>ADR-002: a fixed checklist instead of an AI manager.</em> I wanted every run to show where it failed and why. A Python state machine makes each transition a rule that can be read and tested: three implementation attempts, then one design redo, then stop. No model can be talked out of these rules, including by text in an issue.</p>
+<p>When the vague issue (#5) could not produce testable criteria, the pipeline stopped at stage 1 and posted a report. The report covered what went wrong, why, where, what was tried, the options and their trade-offs. It did not guess, and so it produced no wrong code. The trade-off is rigidity. A smarter manager might have rephrased the criterion itself, but it could equally have hidden the problem.</p>
+<p><em>ADR-008: an independent reviewer that must show evidence.</em> The reviewer runs in its own job with a read-only token and a different model. It sees only the issue, the diff and the repository at the PR head. It must fill a six-row rubric with evidence, such as file:line references or test output. Code rejects a review where APPROVE has a failed row, or where “changes requested” has no failed row or no finding with a file and line. Without this, a reviewer can simply approve everything.</p>
+<p>On the pipeline’s own PRs, the reviewer sent issue #2 back once. The fix had made <code>update()</code> atomic, but the reviewer pointed out that <code>update_multiple()</code> had the same partial-update bug. Nobody had reported that, and the hidden tests didn’t cover it. The next round fixed it.</p>
+<h1 id="decision-experiments">3. Decision experiments</h1>
+<p>Both experiments reuse the five seeded PRs (§4), whose correct verdicts are known. Only one variable changes in each (<code>experiment/variants.md</code>). All runs are linked in <code>results/experiments.md</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Seeded PR (label)</th>
+<th>Default: Sonnet</th>
+<th><strong>A</strong>: Haiku reviewer</th>
+<th><strong>B</strong>: Sonnet + spec</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>S1 clean → APPROVE</td>
+<td>✅ APPROVE</td>
+<td>✅ APPROVE</td>
+<td>✅ APPROVE</td>
+</tr>
+<tr>
+<td>S2 cache bug → CHANGES</td>
+<td>✅ R1, R4</td>
+<td>✅ R4, R5</td>
+<td>✅ R1, R4</td>
+</tr>
+<tr>
+<td>S3 weak tests → CHANGES</td>
+<td>✅ R3</td>
+<td>✅ R3, R4</td>
+<td>✅ R3</td>
+</tr>
+<tr>
+<td>S4 risky fsync removal → CHANGES</td>
+<td>✅ R5</td>
+<td>✅ R5</td>
+<td>✅ R5 (spec listed it as FR-3)</td>
+</tr>
+<tr>
+<td>S5 clean → APPROVE</td>
+<td>✅ APPROVE</td>
+<td>✅ APPROVE</td>
+<td>✅ APPROVE</td>
+</tr>
+<tr>
+<td>Correct / cost of 5 reviews</td>
+<td>5/5 · $0.133</td>
+<td>5/5 · <strong>$0.019</strong></td>
+<td>5/5 · $0.148</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Experiment A (ADR-006): does the reviewer need the stronger model?</strong> We expected Haiku, the same model as the Implementer, to miss defects or approve more. It did not. It got all five verdicts right at about one seventh of the cost.</p>
+<p>Its rubric was less precise: it filed S2’s logic bug under R5, “risky change”. It also went deeper once: on S3 it noticed that an old table handle can cache stale results after a table is re-created.</p>
+<p><strong>What I changed:</strong> I kept Sonnet. A review costs about $0.03 per issue, the reviewer is the last check before a human, and the case where Sonnet shone (a second, unreported copy of a bug in issue #2) was not tested with Haiku. I added this evidence to ADR-006 and wrote down that the argument for the decision is now weaker. If a harder seeded set also shows no gap, ADR-006 should be superseded.</p>
+<p><strong>Experiment B (ADR-008): does seeing the spec make the reviewer agree with the implementer?</strong> We wrote specs from the implementer’s point of view, so for S2–S4 each spec agrees with the planted defect. The strongest case is S4, whose spec lists “remove fsync for speed” as a requirement. The reviewer still failed R5 and noted that the issue never asked for it. It judged the spec against the issue, not the other way round. No verdict changed.</p>
+<p><strong>What I changed:</strong> the rule stays, since hiding the spec costs nothing, but ADR-008 now calls it a precaution, not a measured effect.</p>
+<p><strong>A validity lesson.</strong> In one B trial, the reviewer tried <code>cat … spec.md</code>. Our command guard denied it (ADR-013), and the reviewer never fell back to the Read tool, so it never saw the spec. We found this only by checking the log. We marked the trial invalid and re-ran it, and the re-run read the spec and gave the same verdict. Every experiment needs a check that the treatment actually happened.</p>
+<h1 id="results">4. Results</h1>
+<p><strong>Issue runs.</strong> There were 7 build runs over 5 issues: one first pass per issue, one review round for #2, and one re-run of #5 after a clarification.</p>
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Passed first try</th>
+<th>Passed after a retry</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1 Requirements</td>
+<td>3/6</td>
+<td>5/6</td>
+<td>#1: the judge rejected a vague AC (“consistent with storage”). #5b: one AC was not in GWT form. #5a: rejected twice → escalated</td>
+</tr>
+<tr>
+<td>2 Design</td>
+<td>5/5</td>
+<td>5/5</td>
+<td>every named target existed</td>
+</tr>
+<tr>
+<td>3 Implement</td>
+<td>5/5</td>
+<td>5/5</td>
+<td>no edit outside <code>tinydb/</code> had to be reverted; 1 extra attempt came from CI (#5b)</td>
+</tr>
+<tr>
+<td>4 Test</td>
+<td>5/5</td>
+<td>5/5</td>
+<td>23 ACs, each with at least one test; full suite green each time</td>
+</tr>
+<tr>
+<td>5 Release (CI)</td>
+<td>4/5</td>
+<td>5/5</td>
+<td>#5b failed the mypy type check on CI → Implementer fixed it</td>
+</tr>
+<tr>
+<td>6 Review</td>
+<td>4/5 approve</td>
+<td>5/5 approve</td>
+<td>#2 sent back once (real defect, see §2)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Hidden tests:</strong></p>
+<ul>
+<li><strong>First pass, no human input:</strong> 4/5 issues reached an approved PR, and all 4 passed their hidden tests (13/13).</li>
+<li><strong>After one maintainer clarification on #5:</strong> 5/5 issues have an approved PR, and hidden tests pass 16/16.</li>
+<li><strong>Cost:</strong> $0.77 for all pipeline runs, mean $0.15 per issue, maximum $0.21 (#5, both runs). The median build run took 4.3 minutes, about 2 of them waiting for CI.</li>
+</ul>
+<p><strong>What the reviewer caught, and where it was wrong.</strong></p>
+<ul>
+<li><strong>Seeded PRs:</strong> 5/5 correct verdicts, and the expected rubric row failed every time. It named the exact line and cause of S2’s cache bug (“truncated before the cache store”) and suggested the right fix. It said S3’s tests “pass without the fix”, and it rated S4’s fsync removal high severity.</li>
+<li><strong>Pipeline PRs:</strong> one send-back (#2), and it was correct.</li>
+<li><strong>Wrong:</strong> across the 10 PRs and 21 reviews, we saw no false approval and no rejection of a correct change.</li>
+<li><strong>Imprecise:</strong> the Haiku variant once put a defect in the wrong rubric row, and a few APPROVE reviews carried low-severity nits (for example, docstrings not updated).</li>
+<li><strong>Not measured:</strong> how often it would miss a subtle defect. Our seeded defects were each single and visible.</li>
+</ul>
+<p><strong>Tokens.</strong> The pipeline runs used 1,139,503 input tokens (most of them cache reads) and 66,395 output tokens. The 16 review-only runs cost $0.34 more. Their token counts were not logged per run (see §6). The provider console reports TOTAL_TOKENS_PLACEHOLDER tokens in total for the project key.</p>
+<h1 id="hindsight">5. Hindsight</h1>
+<p>If I started again tomorrow, the first decision I would change is <strong>what counts as the issue</strong> (ADR-003, later ADR-012). I designed the agents to read only the issue’s title and body. That seemed like the cleanest, least-injectable input, and I never asked how a maintainer would clarify a vague request. On a real project, that happens in the comments.</p>
+<p>The vague issue showed the gap. The pipeline did the right thing and stopped. But when I wrote the clarification, the agents could not see it, and the fix needed an extra pipeline PR and a second run. If comments from maintainers had been part of the input from the first day, with strangers’ comments excluded for the same security reason, #5 would have been a normal two-step conversation. The security rule did not need to change, only where I applied it.</p>
+<h1 id="limitations-and-threats-to-validity">6. Limitations and threats to validity</h1>
+<ol type="1">
+<li><strong>Small samples.</strong> There are 5 issues and 5 seeded PRs, with one run per variant. LLM output varies between runs: a single flip changes 5/5 into 4/5, and no difference in Experiments A and B can be called significant.</li>
+<li><strong>The same author wrote the tests and the defects.</strong> I wrote the issues, the hidden tests, the seeded defects and the reviewer rubric. The seeded defects map neatly onto rubric rows (R1/R3/R5), and each PR has a single defect. A harder or independently written set could show misses that we did not see.</li>
+<li><strong>The hidden tests encode one reading of each issue.</strong> For the vague issue in particular, they encode “missing field counts as 0”, and a maintainer clarification was given before the second run. That clarification was written by me, knowing the intended behaviour.</li>
+<li><strong>One small, well-tested codebase.</strong> TinyDB is about 2,300 lines of library code, with a fast suite and a clear architecture document from A2. Results may not carry over to larger or messier repositories.</li>
+<li><strong>Logging gaps.</strong> Review-only runs logged cost but not tokens, and only the last attempt of each agent call keeps a full transcript. Costs are as reported by the SDK.</li>
+<li><strong>The model versions are fixed in time.</strong> The results hold for Claude Sonnet 5.5 and Haiku 5.5 as of 21 Nov 2026.</li>
+</ol>
+<h1 id="appendix-where-to-find-everything">Appendix: where to find everything</h1>
+<ul>
+<li><strong>Runs, PRs, reviews:</strong> <code>results/runs.md</code> and <code>results/experiments.md</code>. Per-run data: <code>results/results.csv</code> (23 rows).</li>
+<li><strong>Views:</strong> <code>architecture/views/</code> (component view, sequence view, stage map). ADRs: <code>architecture/decisions/</code> (001–013).</li>
+<li><strong>Code:</strong> <code>workflow/</code> (an exact copy of the fork’s <code>autose.yml</code> and <code>.autose/</code>, with 19 offline tests).</li>
+<li><strong>Inputs:</strong> <code>experiment/issues</code>, <code>experiment/hidden_tests</code>, <code>experiment/seeded_prs</code> (diffs + labels), <code>experiment/variants.md</code>.</li>
+</ul>
+</body>
+</html>

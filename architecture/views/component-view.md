@@ -65,4 +65,12 @@ flowchart TB
 | Reviewer | LLM agent | Issue, diff, repo at PR head | `review.md` (returned as text) | none (never sees it) |
 
 Key rule: **no agent ever holds a GitHub token.** Every GitHub write goes through plain code
-that the orchestrator controls (ADR-005, to be written).
+that the orchestrator controls (ADR-005).
+
+## As built (differences from this pre-code view)
+
+- The gate is a small Python script (`gate.py`), not shell. Its token can also cancel runs (`/autose restart`).
+- The Implementer may edit only `tinydb/`. Any other change is reverted by the orchestrator after the agent finishes.
+- Every agent's Bash is limited to `python -m pytest [args]` by a PreToolUse guard (ADR-013). Reading `.git` is denied.
+- Maintainer comments are added to the issue text as "Clarifications from maintainers" (ADR-012).
+- CI on the bot branch is started with `workflow_dispatch`, because pushes made with `GITHUB_TOKEN` trigger no workflows.

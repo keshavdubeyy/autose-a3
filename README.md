@@ -1,33 +1,70 @@
 # AutoSE Assignment 3: Agentic SDLC Workflow
 
-Issue in, reviewed pull request out.
+Issue in, reviewed pull request out. A maintainer labels an issue in the fork. Four agents then
+write the spec and the design, change the code and test it, and the pipeline opens a PR. A
+separate read-only reviewer reviews the PR. A human always makes the merge decision.
 
 | | |
 | --- | --- |
 | Fork | https://github.com/keshavdubeyy/tinydb |
 | Pinned commit | `edff96aeb2616402e9489d46e90a592c05565621` (upstream msiemens/tinydb) |
-| Default branch | `master` (protected: PRs only) |
-| Models | Planner + Reviewer: `claude-sonnet-5-5`; Implementer + Tester: `claude-haiku-5-5` (ADR-006) |
-| Trigger | add label `autose` to an issue, or comment `/autose` (collaborators only) |
+| Default branch | `master` (protected: changes only through PRs; the bot never merges) |
+| Models | Planner + Reviewer: `claude-sonnet-5-5`. Implementer + Tester + spec judge: `claude-haiku-5-5` (ADR-006) |
+| Report | [`report.pdf`](report.pdf) (source: `report/report.md`) |
+| Demo video | DEMO_LINK_PLACEHOLDER |
+| Total spend | $1.10 over 23 workflow runs (`results/results.csv`) |
+
+## How to trigger the workflow
+
+- **Start a run:** add the label `autose` to an issue in the fork, or post a comment starting with
+  `/autose`. Only collaborators can start a run this way. A comment from anyone else gets a
+  polite reply and the `autose-requested` label (ADR-010).
+- **Clarify an issue:** a maintainer comments on it and then comments `/autose`. Maintainer comments are
+  added to the agents' input. Other people's comments are not (ADR-012).
+- **Cancel and restart:** comment `/autose restart`.
+- **Review only (seeded PRs, experiments):** Actions → AutoSE → *Run workflow*, with `mode=review_only`,
+  `pr=<number>`, `issue=<number>` and `variant=default|same_model|with_spec`.
+
+Progress shows in a status comment on the issue. All stage artifacts (`spec.md`, `design.md`,
+`diff.patch`, `test_report.md`, `pr.md`, `review.md`, logs) are uploaded to each Actions run.
+
+## Results in one paragraph
+
+- All 5 issues ended with a reviewer-approved PR (#7–#10, #12), and 16/16 hidden tests pass.
+- The vague issue (#5) first stopped at requirements with an escalation report. It completed after
+  one maintainer clarification.
+- The reviewer gave the right verdict on 5/5 seeded PRs.
+- Experiment A (a Haiku reviewer) and Experiment B (a reviewer that sees the spec) changed no verdicts.
+  Both are negative results, and the details are in `results/experiments.md`.
 
 ## Layout
 
 ```
+README.md                this file
+report.pdf               the report (5 pages)
+report/                  report source (Markdown) and print stylesheet
 architecture/views/      component view, sequence view, stage map
-architecture/decisions/  ADRs (superseded ones kept)
-workflow/                copy of the fork's .github/workflows + agent code + prompts
-experiment/issues/       the 5 issue texts (posted as fork issues #1–#5)
+architecture/decisions/  ADR-001 … ADR-013 (ADR-001 superseded by ADR-011, kept)
+workflow/                exact copy of the fork's .github/workflows/autose.yml and .autose/ (code, prompts, offline tests)
+experiment/issues/       the 5 issue texts (fork issues #1–#5)
 experiment/hidden_tests/ hidden acceptance tests (never placed in the fork)
-experiment/seeded_prs/   reviewer-check PRs
-results/                 results.csv, runs.md
+experiment/seeded_prs/   the 5 reviewer-check PRs: diffs, labels and results
+experiment/variants.md   what each decision-experiment variant changes
+results/results.csv      one row per workflow run
+results/runs.md          links to every Actions run, PR and review
+results/experiments.md   Experiments A and B side by side
 ```
-
-## Status
-
-Design phase. The component view, stage map and all ADRs (001–011) were committed before
-any agent code.
 
 ## AI use
 
-Claude Code helped explore the codebase, draft issue texts, hidden tests and first ADR
-drafts. All drafts were reviewed and edited by the author.
+I used Claude Code (Claude Opus 5.5) substantially:
+- to explore the TinyDB codebase;
+- to draft the issue texts, hidden tests and seeded PRs;
+- to write the workflow, the orchestrator, the agent prompts and the offline tests;
+- to run and log the experiments, and to draft the report text and diagrams.
+
+The ADRs record my own decisions and reasoning. For each ADR, Claude asked me questions and I chose
+the option and gave the reason. Claude then wrote it up in plain English, and I reviewed every ADR.
+The hindsight choice and the post-experiment design decisions (keep Sonnet, keep the no-spec rule) are mine.
+
+I reviewed all generated code and documents. All runs, PRs and reviews are real and linked in `results/runs.md`.

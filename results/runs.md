@@ -25,3 +25,32 @@ Hidden tests are run by hand on the bot's branch after each run. The pipeline ne
 | Implement | claude-haiku-5-5 | 0.003 | 7 |
 | Test | claude-haiku-5-5 | 0.003 | 5 |
 | Review | claude-sonnet-5-5 | 0.033 | n/a |
+
+## Review-only runs (seeded PRs and experiments)
+
+Verdict details, labels and costs are in `experiment/seeded_prs/labels.md` and `results/experiments.md`.
+
+| Run | Kind | PR | Reviewer | Verdict | Correct | Review |
+|---|---|---|---|---|---|---|
+| [44924367862](https://github.com/keshavdubeyy/tinydb/actions/runs/44924367862) | seeded (default) | [#13](https://github.com/keshavdubeyy/tinydb/pull/13) | claude-sonnet-5-5 | APPROVE | true | [on PR](https://github.com/keshavdubeyy/tinydb/pull/13) |
+| [44924370850](https://github.com/keshavdubeyy/tinydb/actions/runs/44924370850) | seeded (default) | [#14](https://github.com/keshavdubeyy/tinydb/pull/14) | claude-sonnet-5-5 | CHANGES_CODE | true | [on PR](https://github.com/keshavdubeyy/tinydb/pull/14) |
+| [44924375113](https://github.com/keshavdubeyy/tinydb/actions/runs/44924375113) | seeded (default) | [#15](https://github.com/keshavdubeyy/tinydb/pull/15) | claude-sonnet-5-5 | CHANGES_CODE | true | [on PR](https://github.com/keshavdubeyy/tinydb/pull/15) |
+| [44924379841](https://github.com/keshavdubeyy/tinydb/actions/runs/44924379841) | seeded (default) | [#16](https://github.com/keshavdubeyy/tinydb/pull/16) | claude-sonnet-5-5 | CHANGES_CODE | true | [on PR](https://github.com/keshavdubeyy/tinydb/pull/16) |
+| [44924382880](https://github.com/keshavdubeyy/tinydb/actions/runs/44924382880) | seeded (default) | [#17](https://github.com/keshavdubeyy/tinydb/pull/17) | claude-sonnet-5-5 | APPROVE | true | [on PR](https://github.com/keshavdubeyy/tinydb/pull/17) |
+| [44925038019](https://github.com/keshavdubeyy/tinydb/actions/runs/44925038019) | expA (same_model) | [#13](https://github.com/keshavdubeyy/tinydb/pull/13) | claude-haiku-5-5 | APPROVE | true | [on PR](https://github.com/keshavdubeyy/tinydb/pull/13) |
+| [44925040982](https://github.com/keshavdubeyy/tinydb/actions/runs/44925040982) | expA (same_model) | [#14](https://github.com/keshavdubeyy/tinydb/pull/14) | claude-haiku-5-5 | CHANGES_CODE | true | [on PR](https://github.com/keshavdubeyy/tinydb/pull/14) |
+| [44925043823](https://github.com/keshavdubeyy/tinydb/actions/runs/44925043823) | expA (same_model) | [#15](https://github.com/keshavdubeyy/tinydb/pull/15) | claude-haiku-5-5 | CHANGES_CODE | true | [on PR](https://github.com/keshavdubeyy/tinydb/pull/15) |
+| [44925046839](https://github.com/keshavdubeyy/tinydb/actions/runs/44925046839) | expA (same_model) | [#16](https://github.com/keshavdubeyy/tinydb/pull/16) | claude-haiku-5-5 | CHANGES_CODE | true | [on PR](https://github.com/keshavdubeyy/tinydb/pull/16) |
+| [44925050553](https://github.com/keshavdubeyy/tinydb/actions/runs/44925050553) | expA (same_model) | [#17](https://github.com/keshavdubeyy/tinydb/pull/17) | claude-haiku-5-5 | APPROVE | true | [on PR](https://github.com/keshavdubeyy/tinydb/pull/17) |
+| [44925179708](https://github.com/keshavdubeyy/tinydb/actions/runs/44925179708) | expB (with_spec) | [#13](https://github.com/keshavdubeyy/tinydb/pull/13) | claude-sonnet-5-5 | APPROVE | true | [on PR](https://github.com/keshavdubeyy/tinydb/pull/13) |
+| [44925182739](https://github.com/keshavdubeyy/tinydb/actions/runs/44925182739) | expB (with_spec) | [#14](https://github.com/keshavdubeyy/tinydb/pull/14) | claude-sonnet-5-5 | CHANGES_CODE | true · invalid: spec not read | [on PR](https://github.com/keshavdubeyy/tinydb/pull/14) |
+| [44925185685](https://github.com/keshavdubeyy/tinydb/actions/runs/44925185685) | expB (with_spec) | [#15](https://github.com/keshavdubeyy/tinydb/pull/15) | claude-sonnet-5-5 | CHANGES_CODE | true | [on PR](https://github.com/keshavdubeyy/tinydb/pull/15) |
+| [44925190171](https://github.com/keshavdubeyy/tinydb/actions/runs/44925190171) | expB (with_spec) | [#16](https://github.com/keshavdubeyy/tinydb/pull/16) | claude-sonnet-5-5 | CHANGES_CODE | true | [on PR](https://github.com/keshavdubeyy/tinydb/pull/16) |
+| [44925192698](https://github.com/keshavdubeyy/tinydb/actions/runs/44925192698) | expB (with_spec) | [#17](https://github.com/keshavdubeyy/tinydb/pull/17) | claude-sonnet-5-5 | APPROVE | true | [on PR](https://github.com/keshavdubeyy/tinydb/pull/17) |
+| [44925408399](https://github.com/keshavdubeyy/tinydb/actions/runs/44925408399) | expB (with_spec) | [#14](https://github.com/keshavdubeyy/tinydb/pull/14) | claude-sonnet-5-5 | CHANGES_CODE | true | [on PR](https://github.com/keshavdubeyy/tinydb/pull/14) |
+
+## Pipeline changes merged during the experiment (by the owner)
+
+- [#6](https://github.com/keshavdubeyy/tinydb/pull/6): pipeline setup
+- [#11](https://github.com/keshavdubeyy/tinydb/pull/11): maintainer clarifications + escalation budget fix (ADR-012)
+- [#18](https://github.com/keshavdubeyy/tinydb/pull/18): specs for the Experiment B variant
