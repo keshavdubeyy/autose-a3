@@ -1,53 +1,82 @@
-# ADR-003: Hand off artifacts, never conversations, and give each agent the least context it needs
+# ADR-003: Each agent gets only what it needs to reach its goal, passed as documents, not chat
 
-- **Status:** Proposed (2026-11-21, before any agent code). Will be tested in Experiment B.
+- **Status:** Accepted (2026-11-21, after author review, before any agent code). The
+  reviewer part is tested in Experiment B.
 - **Decision area:** D3, hand-offs
 
 ## Context
 
-Each agent starts with an empty context. Whatever we pass in shapes what it does. More context
-can help an agent, but it can also anchor it to someone else's mistakes, carry injected text
-further through the pipeline, and cost money on a $10 budget.
+Every agent starts with an empty context. Whatever we hand it shapes what it does. Each agent
+has one specific goal, so the question is: what does it need to reach that goal, and nothing
+more?
+
+Sending everything is tempting, but extra information is not free:
+
+- **It can mislead.** If an agent sees material that isn't about its job, it may act on it.
+  For example, it might "fix" something it read about and change code nobody asked it to.
+- **It can carry an attack.** The issue text is written by anyone, so a hidden instruction
+  in it travels to every agent that reads it.
+- **It costs money.** We have a $10 budget, and every extra page is paid for again by every
+  agent that reads it.
+
+On the other hand, an agent with too little context doesn't know *why* it is doing the work.
+For example, a builder that only sees a list of criteria might meet the letter of the spec
+and miss the point.
 
 Two inputs from earlier assignments must be used: the A1 SRS skill (stage 1) and the A2
-`ARCHITECTURE.md` (stage 2). The A1 skill is large (about 3,200 lines, roughly 45k tokens).
+`ARCHITECTURE.md` (stage 2). The A1 skill is long, about 3,200 lines (roughly 45k tokens).
 
 ## Decision
 
-Agents pass **files (artifacts)**, not chat history. Each one gets exactly this:
+**Rule: give each agent as much as it needs to achieve its goal, and no more.** Agents pass
+**documents**, not conversations.
 
-| Agent / stage | Gets | Deliberately does NOT get | Why it's left out |
+**Every spec starts with a short "Goal" section**, 1–3 sentences in the Planner's words: who
+wants what, and why. Every later agent knows the overall goal, but none of them has to read
+the raw issue text.
+
+| Agent | Gets | Does NOT get | Why |
 | --- | --- | --- | --- |
-| Planner, stage 1 | Issue title + body inside `<untrusted_issue>` tags; a condensed A1 skill (the rules for acceptance criteria, assumptions and open questions) | Code-write tools; other issues | Requirements describe *what*, not *how*. The issue is untrusted text. |
-| Planner, stage 2 | `spec.md`; A2 `ARCHITECTURE.md`; read-only repo | The raw issue | Design should follow the reviewed spec, not re-read the issue and drift. |
-| Implementer, stage 3 | `spec.md`; `design.md`; full repo with edit tools. On a retry: the Tester's failing output (truncated). On a review loop: the reviewer's findings. | The raw issue; the Planner's conversation; permission to edit the Tester's test files | One source of truth (the spec). The raw issue is where prompt injection would live, so the agent with write tools never reads it directly. |
-| Tester (QA), stage 4 | `spec.md`; repo after implementation; pytest | `design.md`; the Implementer's conversation; the raw issue | Tests should check what the user asked for (the acceptance criteria), not what the builder planned. See ADR-011. |
-| Reviewer, stage 6 | Issue; PR diff; repo checked out at the PR head commit | `spec.md`, `design.md`, `test_report.md`, any agent conversation | See ADR-008: the reviewer must judge the result against the *user's* request, not against the pipeline's own interpretation of it. |
+| Planner, stage 1 | The issue inside `<untrusted_issue>` tags; the condensed A1 skill | Code-editing tools | Its job is to understand the request. It is the only agent that reads raw issue text, and it can't change code. |
+| Planner, stage 2 | `spec.md`; A2 `ARCHITECTURE.md`; read-only repo | The raw issue | The plan should follow the spec. |
+| Implementer, stage 3 | `spec.md` (including the Goal); `design.md`; the repo. On a retry: the failing test output. On a review loop: the reviewer's findings. | The raw issue; other agents' chats | It knows the goal and the plan, but never reads text a stranger wrote. |
+| Tester, stage 4 | `spec.md` (including the Goal); the repo after implementation | `design.md`; the Implementer's chat; the raw issue | It tests what the user wants, not what the builder planned (ADR-011). |
+| Reviewer, stage 6 | The issue; the PR diff; the repo at the PR head | `spec.md`, `design.md`, test report, any chat | It judges the result against the user's own words (ADR-008). |
 
-**The A1 skill is condensed.** We extract the sections that define spec structure and
-acceptance-criteria quality into `prompts/a1_skill_condensed.md`, and keep the full file in
-the repo for reference. This keeps stage 1 cheap and focused.
+**Who checks that each agent did its job well?** The orchestrator plays the "moderator" role.
+After every stage it runs that stage's check (testable criteria, files that really exist,
+build passes, tests pass) before anything moves on (ADR-002, ADR-007). The reviewer's rubric
+then judges overall quality at the end. Neither of them is another LLM making decisions:
+checks are code, and the only quality judgement is the reviewer, which is already
+independent.
+
+**The A1 skill is condensed.** We keep only the rules that matter for one GitHub issue: how
+to write testable acceptance criteria, how to separate confirmed requirements from
+assumptions, and how to list open questions. They go in `prompts/a1_skill_condensed.md`, with
+a note on what was dropped and why. The full skill stays in the repo for reference.
 
 ## Alternatives
 
-- **Pass the full conversation forward.** No information is lost. Rejected: it anchors every
-  later agent to earlier reasoning, carries injected issue text all the way to the agent with
-  write access, and costs grow with every stage.
-- **Pass only short summaries.** Cheapest. Rejected: summaries drop details like exact
-  acceptance criteria and file names, and those details are what the checks verify.
-- **Give the reviewer the spec as well.** It could check every acceptance criterion directly.
-  Rejected for now, because the reviewer would be judging against the Planner's
-  interpretation. If the spec misread the issue, the reviewer would approve the misreading.
-  **This is Experiment B**: reviewer with vs without `spec.md`, measured on the seeded PRs
-  and the vague issue.
-- **Feed the full A1 skill every time.** Most faithful to A1. Rejected on cost: about 45k
-  extra input tokens per run, and most of it (stakeholder analysis, document templates) does
-  not apply to a single GitHub issue.
+- **Pass every agent everything (full chats, all documents).** Nothing is lost. Rejected:
+  extra material can mislead an agent into changes nobody asked for, carries any injected
+  text to every agent, and costs more at every stage.
+- **Give the builder the raw issue too.** It would hear the user directly. Rejected: the Goal
+  section gives it the "why" without exposing the agent that edits code to text a stranger
+  wrote. If the Goal turns out to be too thin in practice, we will revisit this.
+- **Pass only short summaries.** Cheapest. Rejected: summaries drop the exact criteria and
+  file names that the checks verify.
+- **Full A1 skill every time.** Most faithful to A1. Rejected: about 45k extra tokens per run,
+  and most of it (stakeholder analysis, long document templates) doesn't apply to one
+  issue. We accept that a condensed version might miss an edge-case rule. Cost is a real
+  trade-off on this budget.
+- **Reviewer also gets the spec.** Tested as **Experiment B** instead of decided up front.
 
 ## Consequences
 
-- Every hand-off is a file a human can open in the run's artifacts, which makes runs easy to
-  follow.
-- If the spec is wrong, the Implementer cannot notice by re-reading the issue. Only the
-  reviewer, who reads the issue fresh, can catch it. This makes ADR-008 load-bearing.
-- The condensed A1 skill must be justified in the report: what was kept and why.
+- Every hand-off is a file a human can open in the run's artifacts.
+- If the Planner misreads the issue, the Implementer and Tester can't catch it, because they
+  work from the spec. Only the reviewer, who reads the issue fresh, can. That makes ADR-008
+  essential.
+- The Goal section is now a required part of `spec.md`, and the stage-1 check rejects a spec
+  without one.
+- The condensed A1 skill must be explained in the report: what was kept, and why.
