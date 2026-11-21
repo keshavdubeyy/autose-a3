@@ -7,7 +7,7 @@ Issue in, reviewed pull request out.
 | Fork | https://github.com/keshavdubeyy/tinydb |
 | Pinned commit | `edff96aeb2616402e9489d46e90a592c05565621` (upstream msiemens/tinydb) |
 | Default branch | `master` (protected: PRs only) |
-| Models | *to be decided in ADR-006* |
+| Models | Planner + Reviewer: `claude-sonnet-5-5`; Implementer + Tester: `claude-haiku-5-5` (ADR-006) |
 | Trigger | add label `autose` to an issue, or comment `/autose` (collaborators only) |
 
 ## Layout
@@ -24,7 +24,7 @@ results/                 results.csv, runs.md
 
 ## Status
 
-Design phase. The component view, stage map and ADR-001/002/003/008/011 were committed before
+Design phase. The component view, stage map and all ADRs (001–011) were committed before
 any agent code.
 
 ## AI use
