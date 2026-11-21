@@ -24,7 +24,7 @@ results/                 results.csv, runs.md
 
 ## Status
 
-Design phase. The component view, stage map and ADR-001/002/003/008 were committed before
+Design phase. The component view, stage map and ADR-001/002/003/008/011 were committed before
 any agent code.
 
 ## AI use

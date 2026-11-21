@@ -1,6 +1,6 @@
 # ADR-001: Three agents (Planner, Implementer, Reviewer), with Release done in plain code
 
-- **Status:** Proposed (2026-11-21, before any agent code)
+- **Status:** Superseded by ADR-011 (2026-11-21). After review I decided the Implementer should not write its own tests. Kept for the record.
 - **Decision area:** D1, splitting the work
 
 ## Context

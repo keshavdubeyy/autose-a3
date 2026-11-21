@@ -1,7 +1,7 @@
 # Component View
 
 How the agents, their tools and the GitHub plumbing fit together.
-Status: initial design, written before any agent code (see git history).
+Status: revised for ADR-011 (four agents: separate Tester), still before any agent code.
 
 ```mermaid
 flowchart TB
@@ -21,10 +21,12 @@ flowchart TB
         subgraph BUILD["Job 1: build · token: contents+PR write"]
             ORCH["Orchestrator<br/>(deterministic Python state machine)<br/>runs checks, counts retries,<br/>decides next stage"]
             PLAN["Planner agent<br/>stages 1-2<br/>tools: Read, Grep, Glob"]
-            IMPL["Implementer agent<br/>stages 3-4<br/>tools: Read, Grep, Glob, Edit, Write, Bash"]
+            IMPL["Implementer agent<br/>stage 3<br/>tools: Read, Grep, Glob, Edit, Write, Bash<br/>may NOT edit Tester's test files"]
+            TEST["Tester (QA) agent<br/>stage 4<br/>tools: Read, Grep, Glob, Write (tests/ only), Bash (pytest)"]
             REL["Release step<br/>(plain code: git push, gh pr create)"]
             ORCH -- "issue (wrapped) + A1 skill" --> PLAN
-            ORCH -- "spec.md + design.md<br/>(+ failure log / review findings on retry)" --> IMPL
+            ORCH -- "spec.md + design.md<br/>(+ failing test output / review findings on retry)" --> IMPL
+            ORCH -- "spec.md only<br/>(no design.md, no Implementer chat)" --> TEST
             ORCH --> REL
         end
 
@@ -56,7 +58,8 @@ flowchart TB
 | Gate | Shell | Event payload | Nothing | read-only |
 | Orchestrator | Python (no LLM) | Everything in the job | Artifacts, branch, PR | contents + PR write |
 | Planner | LLM agent | Repo (read-only), issue, A1 skill, ARCHITECTURE.md | `spec.md`, `design.md` only (returned as text) | none (never sees it) |
-| Implementer | LLM agent | Repo, spec, design | Working tree files | none (never sees it) |
+| Implementer | LLM agent | Repo, spec, design | Working tree files, except the Tester's test files | none (never sees it) |
+| Tester (QA) | LLM agent | Repo after implementation, spec | New test files only | none (never sees it) |
 | Release | Python (no LLM) | Branch | Push branch, open PR | contents + PR write |
 | Review runner | Python (no LLM) | Issue, PR diff | One PR comment, dispatch next round | contents read, PR write |
 | Reviewer | LLM agent | Issue, diff, repo at PR head | `review.md` (returned as text) | none (never sees it) |

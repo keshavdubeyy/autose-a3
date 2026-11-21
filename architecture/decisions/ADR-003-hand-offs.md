@@ -20,7 +20,8 @@ Agents pass **files (artifacts)**, not chat history. Each one gets exactly this:
 | --- | --- | --- | --- |
 | Planner, stage 1 | Issue title + body inside `<untrusted_issue>` tags; a condensed A1 skill (the rules for acceptance criteria, assumptions and open questions) | Code-write tools; other issues | Requirements describe *what*, not *how*. The issue is untrusted text. |
 | Planner, stage 2 | `spec.md`; A2 `ARCHITECTURE.md`; read-only repo | The raw issue | Design should follow the reviewed spec, not re-read the issue and drift. |
-| Implementer, stages 3–4 | `spec.md`; `design.md`; full repo with edit and test tools. On a retry: the last test output (truncated). On a review loop: the reviewer's findings. | The raw issue; the Planner's conversation | One source of truth (the spec). The raw issue is where prompt injection would live, so the agent with write tools never reads it directly. |
+| Implementer, stage 3 | `spec.md`; `design.md`; full repo with edit tools. On a retry: the Tester's failing output (truncated). On a review loop: the reviewer's findings. | The raw issue; the Planner's conversation; permission to edit the Tester's test files | One source of truth (the spec). The raw issue is where prompt injection would live, so the agent with write tools never reads it directly. |
+| Tester (QA), stage 4 | `spec.md`; repo after implementation; pytest | `design.md`; the Implementer's conversation; the raw issue | Tests should check what the user asked for (the acceptance criteria), not what the builder planned. See ADR-011. |
 | Reviewer, stage 6 | Issue; PR diff; repo checked out at the PR head commit | `spec.md`, `design.md`, `test_report.md`, any agent conversation | See ADR-008: the reviewer must judge the result against the *user's* request, not against the pipeline's own interpretation of it. |
 
 **The A1 skill is condensed.** We extract the sections that define spec structure and
