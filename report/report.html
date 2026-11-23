@@ -567,7 +567,7 @@
 <li><strong>Imprecise:</strong> the Haiku variant once put a defect in the wrong rubric row, and a few APPROVE reviews carried low-severity nits (for example, docstrings not updated).</li>
 <li><strong>Not measured:</strong> how often it would miss a subtle defect. Our seeded defects were each single and visible.</li>
 </ul>
-<p><strong>Tokens.</strong> The pipeline runs used 1,139,503 input tokens (most of them cache reads) and 66,395 output tokens. The 16 review-only runs cost $0.34 more. Their token counts were not logged per run (see §6). The provider console reports TOTAL_TOKENS_PLACEHOLDER tokens in total for the project key.</p>
+<p><strong>Tokens.</strong> The pipeline runs used 1,139,503 input tokens (most of them cache reads) and 66,395 output tokens. The 16 review-only runs cost $0.34 more. Their token counts were not logged per run (see §6).</p>
 <h1 id="hindsight">5. Hindsight</h1>
 <p>If I started again tomorrow, the first decision I would change is <strong>what counts as the issue</strong> (ADR-003, later ADR-012). I designed the agents to read only the issue’s title and body. That seemed like the cleanest, least-injectable input, and I never asked how a maintainer would clarify a vague request. On a real project, that happens in the comments.</p>
 <p>The vague issue showed the gap. The pipeline did the right thing and stopped. But when I wrote the clarification, the agents could not see it, and the fix needed an extra pipeline PR and a second run. If comments from maintainers had been part of the input from the first day, with strangers’ comments excluded for the same security reason, #5 would have been a normal two-step conversation. The security rule did not need to change, only where I applied it.</p>

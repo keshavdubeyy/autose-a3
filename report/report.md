@@ -167,7 +167,7 @@ Its rubric was less precise: it filed S2's logic bug under R5, "risky change". I
 - **Imprecise:** the Haiku variant once put a defect in the wrong rubric row, and a few APPROVE reviews carried low-severity nits (for example, docstrings not updated).
 - **Not measured:** how often it would miss a subtle defect. Our seeded defects were each single and visible.
 
-**Tokens.** The pipeline runs used 1,139,503 input tokens (most of them cache reads) and 66,395 output tokens. The 16 review-only runs cost $0.34 more. Their token counts were not logged per run (see §6). The provider console reports TOTAL_TOKENS_PLACEHOLDER tokens in total for the project key.
+**Tokens.** The pipeline runs used 1,139,503 input tokens (most of them cache reads) and 66,395 output tokens. The 16 review-only runs cost $0.34 more. Their token counts were not logged per run (see §6).
 
 # 5. Hindsight
 

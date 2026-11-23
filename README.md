@@ -11,8 +11,26 @@ separate read-only reviewer reviews the PR. A human always makes the merge decis
 | Default branch | `master` (protected: changes only through PRs; the bot never merges) |
 | Models | Planner + Reviewer: `claude-sonnet-5-5`. Implementer + Tester + spec judge: `claude-haiku-5-5` (ADR-006) |
 | Report | [`report.pdf`](report.pdf) (source: `report/report.md`) |
-| Demo video | DEMO_LINK_PLACEHOLDER |
+| Demo video | [`demo.mp4`](demo.mp4) (4:17) |
 | Total spend | $1.10 over 23 workflow runs (`results/results.csv`) |
+
+## Submission links
+
+| Deliverable | Link |
+| --- | --- |
+| Report (≤ 8 pages) | [report.pdf](report.pdf) |
+| Demo video (≤ 5 min) | [demo.mp4](demo.mp4) |
+| Fork with the workflow | https://github.com/keshavdubeyy/tinydb (workflow: [`.github/workflows/autose.yml`](https://github.com/keshavdubeyy/tinydb/blob/master/.github/workflows/autose.yml), code: [`.autose/`](https://github.com/keshavdubeyy/tinydb/tree/master/.autose)) |
+| Copy of the workflow and code | [workflow/](workflow/) |
+| Actions runs | https://github.com/keshavdubeyy/tinydb/actions/workflows/autose.yml |
+| Pull requests opened by the pipeline | https://github.com/keshavdubeyy/tinydb/pulls?q=is%3Apr |
+| Issues (#1–#5) | https://github.com/keshavdubeyy/tinydb/issues?q=is%3Aissue |
+| Architecture views | [component view](architecture/views/component-view.md), [sequence view](architecture/views/sequence-view.md), [stage map](architecture/views/stage-map.md) |
+| ADRs (13) | [architecture/decisions/](architecture/decisions/README.md) |
+| Issue texts and hidden tests | [experiment/issues/](experiment/issues/), [experiment/hidden_tests/](experiment/hidden_tests/) |
+| Seeded PRs (reviewer check) | [experiment/seeded_prs/](experiment/seeded_prs/labels.md) |
+| Decision experiments | [variants](experiment/variants.md), [results](results/experiments.md) |
+| Every run, PR and review | [results/runs.md](results/runs.md), [results/results.csv](results/results.csv) |
 
 ## How to trigger the workflow
 
@@ -41,6 +59,7 @@ Progress shows in a status comment on the issue. All stage artifacts (`spec.md`,
 
 ```
 README.md                this file
+demo.mp4                 demo video (4:17)
 report.pdf               the report (5 pages)
 report/                  report source (Markdown) and print stylesheet
 architecture/views/      component view, sequence view, stage map
